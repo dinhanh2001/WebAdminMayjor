@@ -5,7 +5,7 @@ import Pagination from '@mui/material/Pagination';
 import { Button, Popconfirm } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { AiFillEdit } from 'react-icons/ai';
-import { BsFillBuildingsFill } from 'react-icons/bs';
+// import { BsFillBuildingsFill } from 'react-icons/bs';
 import { MdDelete } from 'react-icons/md';
 import { TbTableExport } from 'react-icons/tb';
 import styled from 'styled-components';
@@ -109,7 +109,7 @@ const OrganizationPage = () => {
   return (
     <MainCard>
       <ControlBar>
-        <Button
+        {/* <Button
           type="primary"
           icon={<BsFillBuildingsFill />}
           onClick={() => {
@@ -117,7 +117,7 @@ const OrganizationPage = () => {
           }}
         >
           {t('pages.organization.addOrganization')}
-        </Button>
+        </Button> */}
         <Button type="primary" icon={<TbTableExport />}>
           {t('pages.organization.exportOrganizationData')}
         </Button>

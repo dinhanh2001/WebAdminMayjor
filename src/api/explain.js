@@ -4,9 +4,9 @@ const getExplainsApi = (params) => {
   // eslint-disable-next-line react-hooks/rules-of-hooks
   let isCheck = params['user_id'] ? `&user_id=${params['user_id']}` : '';
   if (!params.page) {
-    return axiosClient.get(`/explain?org_id=${params['org_id']}&page=${1}&limit=${10}${isCheck}`);
+    return axiosClient.get(`/explain?page=${1}&limit=${10}${isCheck}`);
   }
-  return axiosClient.get(`/explain?org_id=${params['org_id']}&page=${params['page']}&limit=${params['limit']}${isCheck}`);
+  return axiosClient.get(`/explain?page=${params['page']}&limit=${params['limit']}${isCheck}`);
 };
 
 const requestDeleteExplainApi = (id) => {
@@ -26,11 +26,12 @@ const requestSearchExplainApi = (reason_name, user_name, page, limit) => {
 };
 
 const requestUpdateExplainApi = (params) => {
+  console.log(params);
   const id = params['id'];
   if (!id) throw new Error('Id is required');
 
   delete params['id'];
-  return axiosClient.patch(`/explain/${id}`, { active: true, approval_name: params['approval_name'] });
+  return axiosClient.patch(`/explain/${id}`, { active: params?.status, approval_name: params['approval_name'] });
 };
 
 export {

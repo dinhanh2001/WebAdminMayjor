@@ -3,18 +3,16 @@ import { DataTable } from '~/ui-component/molecules';
 import IconButton from '@mui/material/IconButton';
 import { AiFillEye } from 'react-icons/ai';
 import styled from 'styled-components';
-import { Popconfirm } from 'antd';
 import { useTranslation } from 'react-i18next';
 import Pagination from '@mui/material/Pagination';
 import { useUsersStore } from '~/hooks/users';
 // project imports
 import MainCard from '~/ui-component/cards/MainCard';
 import ModalTimeSheet from './ModalTimeSheet';
-import { useTimesheetStore } from '../../../hooks/timesheet';
 const PatrolRequestPage = () => {
   const { t } = useTranslation();
   const { usersState, dispatchGetAllUsers } = useUsersStore();
-  const { timesheetState } = useTimesheetStore();
+
   const [page, setPage] = useState(1);
   const [openModal, setopenModal] = useState(false);
   const [idUser, setIdUser] = useState('');
@@ -31,7 +29,7 @@ const PatrolRequestPage = () => {
   }, [usersState.users]);
   // console.log(users);
   const handleChange = useCallback(
-    (event, value) => {
+    (_, value) => {
       dispatchGetAllUsers({ params: { page: value } });
       setPage(value);
     },
@@ -42,9 +40,11 @@ const PatrolRequestPage = () => {
     setIdUser(params?.row?.id);
     setopenModal(true);
   }, []);
+
   const handleHide = useCallback(() => {
     setopenModal(false);
   }, []);
+
   const columns = [
     { field: 'username', headerName: t('table.user.username'), flex: 2, align: 'center', headerAlign: 'center' },
     { field: 'name', headerName: t('table.user.name'), flex: 3, align: 'center', headerAlign: 'center' },
@@ -81,15 +81,10 @@ const PatrolRequestPage = () => {
       <DataTableWrapper>
         <DataTable columns={columns} rows={users} checkboxSelection={false} />
       </DataTableWrapper>
-      {/* <PaginationWrapper>
+      <PaginationWrapper>
         <Pagination count={usersState.pagination.totalPages} page={page} onChange={handleChange} color="primary" />
-      </PaginationWrapper> */}
-      <ModalTimeSheet
-        id={idUser}
-        open={openModal ?? openModal}
-        setOpen={handleHide}
-        // handleChangeEditPasswordModal={handleHide}
-      />
+      </PaginationWrapper>
+      <ModalTimeSheet id={idUser} open={openModal ?? openModal} setOpen={handleHide} />
     </MainCard>
   );
 };

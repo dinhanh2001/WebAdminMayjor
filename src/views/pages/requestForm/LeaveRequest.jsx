@@ -21,7 +21,7 @@ import dayjs from 'dayjs';
 const formatExplains = (results) => {
   let response = [];
   results.map((item) => {
-    let active = item['active'] === true ? 'Đã duyệt' : 'Chưa duyệt';
+    let active = item['active'] === true ? 'Đã duyệt' : item?.approval_name ? 'Từ chối' : 'Chưa duyệt';
     let status = item['status'] === 'in' ? 'Chấm vào' : 'Chấm ra';
     response.push({ ...item, active, status });
   });
@@ -48,27 +48,32 @@ const LeaveRequestPage = () => {
   const Explains = useMemo(() => {
     return formatExplains(explainsState.explain);
   }, [explainsState.explain]);
-
+  console.log(Explains);
   const handleDelete = (params) => {
     dispatchDeleteExplain(params['row']['id']);
   };
 
   const handleChangeEditExplainModal = useCallback(
     (id, params) => {
-      if (params['row']['active'] === 'Đã duyệt') {
+      if (params['row']['approval_name']) {
         dispatchToast('warning', 'Đã duyệt đơn này');
+        return;
       } else {
         const dataPost = {
-          name: `Bắt đầu chấm công tại ${params.row['place_name']}`,
+          name: `${params.row.status === 'Chấm ra' ? 'Bắt đầu chấm ra' : 'Bắt đầu chấm công vào'} tại ${params.row['place_name']}`,
           lat: params.row['lat'], //
           long: params.row['long'], //
           target: params.row['id_place'],
-          status: 'in',
-          datetime: new Date(params.row['date_explain']).getTime(),
-          address: params.row['place_name']
+          status: params.row.status === 'Chấm ra' ? 'out' : 'in',
+          datetime:
+            params.row.status === 'Chấm ra'
+              ? new Date(params.row['date_explain']).setHours(17, 0, 0, 0)
+              : new Date(params.row['date_explain']).setHours(7, 0, 0, 0),
+          address: params.row['place_name'],
+          user: params.row?.user_id
         };
         dispatchUpdateTimeSheet(dataPost);
-        dispatchUpdateExplain({ id: id, approval_name: authenticationState?.loginInfo?.name });
+        dispatchUpdateExplain({ id: id, approval_name: authenticationState?.loginInfo?.name, status: true });
         dispatchGetAllExplains({
           org_id: authenticationState.loginInfo['org_ids'][0],
           page: page,
@@ -94,7 +99,16 @@ const LeaveRequestPage = () => {
       page
     ]
   );
-
+  const onHandleRejectExplan = useCallback(
+    (id, params) => {
+      if (params['row']['approval_name']) {
+        dispatchToast('warning', 'Đã duyệt đơn này');
+        return;
+      }
+      dispatchUpdateExplain({ id: id, approval_name: authenticationState?.loginInfo?.name, status: false });
+    },
+    [authenticationState?.loginInfo?.name, dispatchUpdateExplain]
+  );
   const columns = [
     { field: 'user_name', headerName: t('table.requestForm.makePeople'), flex: 1 },
     { field: 'place_name', headerName: t('table.requestForm.place'), flex: 1 },
@@ -118,8 +132,11 @@ const LeaveRequestPage = () => {
           <Popconfirm
             title="Bạn có chắc chắn muốn duyệt đơn này?"
             onConfirm={() => handleChangeEditExplainModal(params['row']['id'], params)}
+            onCancel={() => {
+              onHandleRejectExplan(params['row']['id'], params);
+            }}
             okText="Đồng ý"
-            cancelText="Hủy"
+            cancelText="Từ chối"
           >
             <IconButton aria-label="edit" color="primary">
               <AiFillEdit size={22} />

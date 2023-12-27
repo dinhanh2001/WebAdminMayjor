@@ -9,7 +9,7 @@ import { Badge } from 'antd';
 const ModalTimeSheet = ({ id, open, setOpen }) => {
   const { dispatchGetTimeSheet, timesheetState } = useTimesheetStore();
   const { t } = useTranslation();
-  console.log(timesheetState?.timesheetUser?.map((value) => value));
+
   useEffect(() => {
     dispatchGetTimeSheet(id);
   }, [dispatchGetTimeSheet, id]);
@@ -19,7 +19,7 @@ const ModalTimeSheet = ({ id, open, setOpen }) => {
     setOpen(false);
   }, [setOpen]);
 
-  const FCTest = useCallback(
+  const cellData = useCallback(
     (date) => {
       return timesheetState?.timesheetUser?.map((value) => {
         // console.log(value);
@@ -35,7 +35,7 @@ const ModalTimeSheet = ({ id, open, setOpen }) => {
     },
     [timesheetState?.timesheetUser]
   );
-  console.log(timesheetState?.timesheetUser);
+
   return (
     <>
       <Modal
@@ -48,7 +48,7 @@ const ModalTimeSheet = ({ id, open, setOpen }) => {
         okText={t('modal.user.submitEditUser')}
         cancelText={t('modal.user.cancel')}
       >
-        <Calendar cellRender={FCTest} />
+        <Calendar cellRender={cellData} />
       </Modal>
     </>
   );
